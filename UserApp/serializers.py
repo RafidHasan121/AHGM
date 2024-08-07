@@ -11,16 +11,22 @@ class EmployeeSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='user.name')
     phone = serializers.CharField(source='user.phone')
     photo = serializers.ImageField(source='user.photo', required=False)
+    address = serializers.CharField(source='user.address', required=False)
     designation = serializers.CharField(source='user.designation')
     
     class Meta:
         model = Employee
-        fields = ('name', 'password', 'phone', 'photo','designation', 'def_shifts', 'def_project', 'fingerprint')
+        fields = ('name', 'password', 'phone', 'photo','address','designation', 'def_shifts', 'def_project', 'fingerprint')
 
 class ProjectSerializer(serializers.ModelSerializer):
+    task_count = serializers.SerializerMethodField()
+
+    def get_task_count(self, obj):
+        return task.objects.filter(project=obj).count()
+    
     class Meta:
         model = project
-        fields = '__all__'
+        fields = ('name', 'description', 'deadline', 'location')
         
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
