@@ -31,6 +31,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['ahgm-production.up.railway.app', '127.0.0.1']
 
+CSRF_TRUSTED_ORIGINS = ['https://ahgm-production.up.railway.app','https://127.0.0.1']
+
 
 # Application definition
 
