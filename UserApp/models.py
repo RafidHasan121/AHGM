@@ -14,29 +14,24 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_(
             "Designates whether the user can log into this admin site."),
     )
-    designation = models.CharField(max_length=50, default="Admin")
+    designation = models.CharField(max_length=50)
     address = models.TextField(null=True, blank=True)
     USERNAME_FIELD = 'phone'
     REQUIRED_FIELDS = []
     objects = UserManager()
 
+
 class location (models.Model):
     name = models.CharField(max_length=50)
     latitude = models.FloatField()
     longitude = models.FloatField()
-    
+
+
 class project (models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
     deadline = models.DateTimeField()
     location = models.OneToOneField(location, on_delete=models.PROTECT)
-
-
-class task(models.Model):
-    name = models.CharField(max_length=50)
-    description = models.TextField(null=True, blank=True)
-    project = models.ForeignKey(project, on_delete=models.CASCADE)
-    deadline = models.DateTimeField()
 
 
 class shifts(models.Model):
@@ -47,14 +42,23 @@ class shifts(models.Model):
 
 class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    def_shifts = models.ForeignKey(shifts, on_delete=models.CASCADE)
-    def_project = models.ForeignKey(project, on_delete=models.CASCADE)
+    shift = models.OneToOneField(
+        shifts, on_delete=models.SET_NULL, null=True, blank=True)
 
-class attendance(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+
+class task(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.TextField(null=True, blank=True)
     project = models.ForeignKey(project, on_delete=models.CASCADE)
+    deadline = models.DateTimeField()
+    employees = models.ManyToManyField(Employee, related_name='tasks')
+
+
+class Attendance(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     checkIn_time = models.DateTimeField()
-    checkIn_location = models.OneToOneField(location, on_delete=models.PROTECT, related_name='checkIn_location')
-    checkOut_time = models.DateTimeField()
-    checkOut_location = models.OneToOneField(location, on_delete=models.PROTECT, related_name='checkOut_location')
-    
+    checkIn_location = models.OneToOneField(
+        location, on_delete=models.PROTECT, related_name='checkIn_location')
+    checkOut_time = models.DateTimeField(null=True, blank=True)
+    checkOut_location = models.OneToOneField(
+        location, on_delete=models.PROTECT, related_name='checkOut_location', null=True, blank=True)
