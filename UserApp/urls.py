@@ -4,12 +4,14 @@ from .views import *
 
 router = routers.SimpleRouter()
 router.register(r'emp', EmployeeViewSet)
+router.register(r'adm', AdminViewSet)
 router.register(r'project', projectViewSet)
 router.register(r'task', taskViewSet)
 router.register(r'shifts', shiftsViewSet)
-
+router.register(r'attendance', attendanceViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    # path("invite/", invite, name="invite"),
+    path("status/", status_check, name="Status Check"),
+    path("auth/", auth, name="Login/Logout"),
 ]
