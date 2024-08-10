@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'Backend.wsgi.application'
 # Replace the SQLite DATABASES configuration with PostgreSQL:
 DATABASES = {
     'default': dj_database_url.config(
-       default="postgresql://postgres:yBRtIjAPFzgAoFQYEeOxVmacgdQAwHdR@roundhouse.proxy.rlwy.net:12793/railway",
+       default=os.getenv("DATABASE_URL"),
         conn_max_age=60,
         conn_health_checks=True
     )
