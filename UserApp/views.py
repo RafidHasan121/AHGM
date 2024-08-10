@@ -134,6 +134,8 @@ class attendanceViewSet(ModelViewSet):
 @api_view(['GET'])
 def status_check(request):
     emp = request.query_params.get('employee')
+    if not emp:
+        raise ObjectDoesNotExist
     instance = Attendance.objects.get(employee=emp).latest('checkIn_time')
     if not instance:
         raise ObjectDoesNotExist
@@ -165,5 +167,8 @@ def auth(request):
         else:
             return Response(status=401)
     else:
-        Token.objects.delete(user=request.user)
+        try:
+            Token.objects.delete(user=request.user)
+        except:
+            raise PermissionDenied
         return Response(status=200)
