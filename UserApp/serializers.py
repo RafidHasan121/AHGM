@@ -14,19 +14,17 @@ class ShiftSerializer(serializers.ModelSerializer):
 
 class EmployeeSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    # password = serializers.CharField(write_only=True)
-    # name = serializers.CharField(source='user.name')
-    # phone = serializers.CharField(source='user.phone')
-    # photo = serializers.ImageField(source='user.photo', required=False)
-    # address = serializers.CharField(source='user.address', required=False)
-    # designation = serializers.CharField(source='user.designation')
-    shift = ShiftSerializer()
+    get_shift = ShiftSerializer(read_only=True)
     
     class Meta:
         model = Employee
-        # fields = ('name', 'password', 'phone', 'photo',
-        #           'address', 'designation', 'shift')
-        fields = ('user', 'shift')
+        fields = ('user', 'shift', 'get_shift')
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user = User.objects.create(**user_data)
+        employee = Employee.objects.create(user=user, **validated_data)
+        return employee
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,7 +32,7 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProjectSerializer(serializers.ModelSerializer):
-    location = LocationSerializer()
+    get_location = LocationSerializer(read_only=True)
     task_count = serializers.SerializerMethodField()
 
     def get_task_count(self, obj):
@@ -42,7 +40,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = project
-        fields = ('name', 'description', 'deadline', 'location', 'task_count')
+        fields = ('name', 'description', 'deadline', 'location', 'task_count', 'get_location')
 
 
 class TaskSerializer(serializers.ModelSerializer):
