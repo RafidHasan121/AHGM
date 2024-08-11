@@ -67,7 +67,7 @@ class AttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attendance
         fields = ('employee', 'checkIn_time', 'checkIn_location',
-                  'checkOut_time', 'checkOut_location')
+                  'checkOut_time', 'checkOut_location', 'name', 'designation')
 
 # class AttendanceSerializer(serializers.ModelSerializer):
 
