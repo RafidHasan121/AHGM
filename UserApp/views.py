@@ -156,19 +156,20 @@ def auth(request):
             if user.is_staff:
                 serializer = UserSerializer(user)
                 return Response({'role': "admin",
-                                "token": token.key,
+                                "token": token[0].key,
                                 "user": serializer.data}, status=200)
             else:
                 employee = Employee.objects.get(user=user)
                 serializer = EmployeeSerializer(employee)
                 return Response({'role': "employee",
-                                "token": token.key,
+                                "token": token[0].key,
                                 "user": serializer.data}, status=200)
         else:
             return Response(status=401)
     else:
-        try:
-            Token.objects.delete(user=request.user)
-        except:
-            raise PermissionDenied
+        # try:
+        Token.objects.filter(user=request.user).delete()
+        
+        # except:
+        #     raise PermissionDenied
         return Response(status=200)
