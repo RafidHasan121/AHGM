@@ -167,9 +167,8 @@ def auth(request):
         else:
             return Response(status=401)
     else:
-        # try:
-        Token.objects.filter(user=request.user).delete()
-        
-        # except:
-        #     raise PermissionDenied
+        try:
+            Token.objects.filter(user=request.user).delete()
+        except:
+            raise ObjectDoesNotExist
         return Response(status=200)
