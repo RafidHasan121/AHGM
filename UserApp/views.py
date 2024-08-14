@@ -117,10 +117,13 @@ class attendanceViewSet(ModelViewSet):
         return serializer
     
     def perform_create(self, serializer):
-        if serializer.data.get('checkIn_time').date() == datetime.now().date():
-            raise PermissionDenied
-        serializer.save()
-        return Response({'status': False}, status=201, headers=self.headers)
+        serializer.is_valid(raise_exception=True)
+        # print(serializer.validated_data.get('checkIn_time').date())
+        # if not serializer.validated_data.get('checkIn_time').date() == datetime.now().date():
+        #     raise PermissionDenied
+        attendance_object = serializer.save()
+        return Response({'is_active': True,
+                         'id': attendance_object.id}, status=201, headers=self.headers)
     
     def retrieve(self, request, *args, **kwargs):
         serializer = self.get_serializer(self.queryset, many=True)
@@ -128,7 +131,7 @@ class attendanceViewSet(ModelViewSet):
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
-        instance = Attendance.objects.filter(employee=kwargs['employee']).order_by('-checkIn_time').first()
+        instance = Attendance.objects.filter(employee=request.data['employee']).order_by('-checkIn_time').first()
         if not instance:
             raise PermissionDenied
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
@@ -140,7 +143,7 @@ class attendanceViewSet(ModelViewSet):
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
-        return Response({'status': False}, status=200, headers=self.headers)
+        return Response({'is_active': True}, status=200, headers=self.headers)
 
 @api_view(['GET'])
 def status_check(request):
@@ -150,10 +153,11 @@ def status_check(request):
     instance = Attendance.objects.get(employee=emp).latest('checkIn_time')
     if not instance:
         raise ObjectDoesNotExist
-    if instance.checkOut_time:
-        R = {'status': True}
+    if not instance.checkOut_time:
+        R = {'is_active': True,
+             'id': instance.id}
     else:
-        R = {'status': False}
+        R = {'is_active': False}
     return Response(R, status=200)
 
 @api_view(['POST', 'GET'])
