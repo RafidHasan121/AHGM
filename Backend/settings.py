@@ -163,11 +163,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_RENDERER_CLASSES': [
-        'Backend.custom_renderer.CustomJSONRenderer',
+        # 'Backend.custom_renderer.CustomJSONRenderer',
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ],
-    'EXCEPTION_HANDLER': 'Backend.custom_renderer.custom_exception_handler'
+    # 'EXCEPTION_HANDLER': 'Backend.custom_renderer.custom_exception_handler'
 }
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
