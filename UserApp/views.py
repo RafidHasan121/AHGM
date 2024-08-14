@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.shortcuts import render
+from django.contrib.auth.models import AnonymousUser
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view
@@ -174,7 +175,16 @@ def auth(request):
         return Response(status=200)
 
 @api_view(['GET'])
-def task_list(request):
+def task_list_project_filter(request):
     queryset = task.objects.filter(project=request.query_params.get('project'))
+    serializer = TaskSerializer(queryset, many=True)
+    return Response(serializer.data, status=200)
+
+@api_view(['GET'])
+def task_list_emp_filter(request):
+    print(request.user)
+    if request.user == AnonymousUser():
+        return Response(status=401)
+    queryset = task.objects.filter(employees=request.user)
     serializer = TaskSerializer(queryset, many=True)
     return Response(serializer.data, status=200)
