@@ -103,9 +103,9 @@ class attendanceViewSet(ModelViewSet):
 
     def get_queryset(self):
         if self.action == 'list':
-            queryset = self.queryset.filter(checkin_time__year=self.kwargs['year'], checkin_time__month=self.kwargs['month']).distinct('employee')
+            queryset = self.queryset.filter(checkIn_time__year=self.request.query_params['year'], checkIn_time__month=self.request.query_params['month']).distinct('employee')
         if self.action == "retrieve":
-            queryset = self.queryset.filter(employee=self.kwargs['employee'], checkin_time__year=self.kwargs['year'], checkin_time__month=self.kwargs['month']).order_by('checkin_time')
+            queryset = self.queryset.filter(employee=self.request.query_params['employee'], checkIn_time__year=self.request.query_params['year'], checkIn_time__month=self.request.query_params['month']).order_by('checkIn_time')
         return queryset
     
     def get_serializer_class(self):
