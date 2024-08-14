@@ -22,7 +22,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class location (models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, null=True, blank=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
 
@@ -57,8 +57,8 @@ class task(models.Model):
 class Attendance(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     checkIn_time = models.DateTimeField()
-    checkIn_location = models.OneToOneField(
-        location, on_delete=models.PROTECT, related_name='checkIn_location')
+    checkIn_location_lat = models.FloatField()
+    checkIn_location_long = models.FloatField()
     checkOut_time = models.DateTimeField(null=True, blank=True)
-    checkOut_location = models.OneToOneField(
-        location, on_delete=models.PROTECT, related_name='checkOut_location', null=True, blank=True)
+    checkOut_location_lat = models.FloatField(null=True, blank=True)
+    checkOut_location_long = models.FloatField(null=True, blank=True)
