@@ -30,7 +30,7 @@ class EmployeeViewSet(ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def create(self, request, *args, **kwargs):
-        if not request.data.get('password'):
+        if not request.data['user']['password']:
             raise PermissionDenied
         return super().create(request, *args, **kwargs)
     
