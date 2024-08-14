@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.shortcuts import render
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.hashers import make_password
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view
@@ -29,10 +30,15 @@ class EmployeeViewSet(ModelViewSet):
 
         return [permission() for permission in permission_classes]
 
-    def create(self, request, *args, **kwargs):
-        if not request.data['user']['password']:
-            raise PermissionDenied
-        return super().create(request, *args, **kwargs)
+    def perform_create(self, serializer):
+        serializer.is_valid(raise_exception=True)
+        password = serializer.validated_data['user'].pop('password')
+        serializer.validated_data['user']['password'] = make_password(password)
+        serializer.save()
+    # def create(self, request, *args, **kwargs):
+    #     if not request.data['user']['password']:
+    #         raise PermissionDenied
+    #     return super().create(request, *args, **kwargs)
     
     def update(self, request, *args, **kwargs):
         if not self.request.user.is_staff:

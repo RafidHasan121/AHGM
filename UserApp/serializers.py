@@ -5,7 +5,7 @@ from UserApp.models import Employee, User, Attendance, location, project, shifts
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'name', 'phone', 'photo', 'designation', 'address')
+        fields = ('id', 'name', 'phone', 'password', 'photo', 'designation', 'address')
 
 class ShiftSerializer(serializers.ModelSerializer):
     class Meta:
