@@ -28,7 +28,7 @@ class EmployeeViewSet(ModelViewSet):
 
         return [permission() for permission in permission_classes]
 
-    def update(self, request, *args, **kwargs):       
+    def update(self, request, *args, **kwargs):
         if not self.request.user.is_staff:
             kwargs.pop('shift', None)
             kwargs.pop('project', None)
@@ -41,7 +41,7 @@ class EmployeeViewSet(ModelViewSet):
                 kwargs.pop('password')
                 self.get_object().user.set_password("123456")
                 self.get_object().user.save()
-        
+
         return super().update(request, *args, **kwargs)
 
 
@@ -70,6 +70,10 @@ class taskViewSet(ModelViewSet):
 
         return [permission() for permission in permission_classes]
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.queryset.filter(project=kwargs["pk"])
+        serializer = self.get_serializer(instance, many=True)
+        return Response(serializer.data)
 
 class shiftsViewSet(ModelViewSet):
     queryset = shifts.objects.all()
