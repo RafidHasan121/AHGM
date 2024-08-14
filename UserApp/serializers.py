@@ -3,6 +3,11 @@ from rest_framework import serializers
 from UserApp.models import Employee, User, Attendance, location, project, shifts, task
 
 class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        style={'input_type': 'password', 'placeholder': 'Password'}
+    )
     class Meta:
         model = User
         fields = ('id', 'name', 'phone', 'password', 'photo', 'designation', 'address')
