@@ -32,7 +32,7 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProjectSerializer(serializers.ModelSerializer):
-    get_location = LocationSerializer()
+    location = LocationSerializer()
     task_count = serializers.SerializerMethodField()
 
     def get_task_count(self, obj):
@@ -40,7 +40,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = project
-        fields = ('name', 'description', 'deadline', 'location', 'task_count', 'get_location')
+        fields = ('name', 'description', 'deadline', 'location', 'task_count')
 
     def create(self, validated_data):
         location_data = validated_data.pop('location')
