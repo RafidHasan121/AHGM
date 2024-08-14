@@ -14,6 +14,7 @@ class ShiftSerializer(serializers.ModelSerializer):
 
 class EmployeeSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    shift = serializers.PrimaryKeyRelatedField(queryset=shifts.objects.all(), write_only=True, allow_null=True, required=False)
     get_shift = ShiftSerializer(read_only=True)
     
     class Meta:

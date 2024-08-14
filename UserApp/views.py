@@ -70,10 +70,6 @@ class taskViewSet(ModelViewSet):
 
         return [permission() for permission in permission_classes]
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.queryset.filter(project=kwargs["pk"])
-        serializer = self.get_serializer(instance, many=True)
-        return Response(serializer.data)
 
 class shiftsViewSet(ModelViewSet):
     queryset = shifts.objects.all()
@@ -176,3 +172,9 @@ def auth(request):
         except:
             raise ObjectDoesNotExist
         return Response(status=200)
+
+@api_view(['GET'])
+def task_list(request):
+    queryset = task.objects.filter(project=request.query_params.get('project'))
+    serializer = TaskSerializer(queryset, many=True)
+    return Response(serializer.data, status=200)

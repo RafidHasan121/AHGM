@@ -14,4 +14,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path("status/", status_check, name="Status Check"),
     path("auth/", auth, name="Login/Logout"),
+    path("tasklist/", task_list, name="Task List by Project"), 
 ]
