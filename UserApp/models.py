@@ -49,9 +49,9 @@ class Employee(models.Model):
 class task(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
-    project = models.ForeignKey(project, on_delete=models.CASCADE)
+    project = models.OneToOneField(project, on_delete=models.CASCADE)
     deadline = models.DateTimeField()
-    employees = models.ManyToManyField(Employee, related_name='tasks')
+    employees = models.ManyToManyField(Employee, related_name='employees')
 
 
 class Attendance(models.Model):

@@ -5,7 +5,7 @@ from UserApp.models import Employee, User, Attendance, location, project, shifts
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('name', 'phone', 'photo', 'designation', 'address')
+        fields = ('id', 'name', 'phone', 'photo', 'designation', 'address')
 
 class ShiftSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,7 +15,7 @@ class ShiftSerializer(serializers.ModelSerializer):
 class EmployeeSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     shift = serializers.PrimaryKeyRelatedField(queryset=shifts.objects.all(), write_only=True, allow_null=True, required=False)
-    get_shift = ShiftSerializer(source='shift')
+    get_shift = ShiftSerializer(source='shift', read_only=True)
     
     class Meta:
         model = Employee
@@ -41,7 +41,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = project
-        fields = ('name', 'description', 'deadline', 'location', 'task_count')
+        fields = ('id', 'name', 'description', 'deadline', 'location', 'task_count')
 
     def create(self, validated_data):
         location_data = validated_data.pop('location')
@@ -52,11 +52,11 @@ class ProjectSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     project_name = serializers.CharField(source='project.name', read_only=True)
     project_location = LocationSerializer(source='project.location', read_only=True)
-    employee_list = EmployeeSerializer(source="employees", many=True)
+    employee_list = EmployeeSerializer(source="employees", many=True, read_only=True)
     employees = serializers.PrimaryKeyRelatedField(many=True, write_only=True, allow_empty=False, queryset=Employee.objects.all())
     class Meta:
         model = task
-        fields = ('name', 'description', 'project', 'project_name', 'project_location', 'deadline','employee_list', 'employees')
+        fields = ('id', 'name', 'description', 'project', 'project_name', 'project_location', 'deadline','employee_list', 'employees')
 
 class ShiftsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -70,7 +70,7 @@ class AttendanceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Attendance
-        fields = ('employee', 'checkIn_time', 'checkIn_location',
+        fields = ('id', 'employee', 'checkIn_time', 'checkIn_location',
                   'checkOut_time', 'checkOut_location', 'name', 'designation')
 
 # class AttendanceSerializer(serializers.ModelSerializer):
@@ -155,4 +155,4 @@ class AttendanceListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Attendance
-        fields = ('employee', 'name', 'designation', 'attendance', 'late', 'overtime')
+        fields = ('id', 'employee', 'name', 'designation', 'attendance', 'late', 'overtime')
