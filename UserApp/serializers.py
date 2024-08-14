@@ -15,7 +15,7 @@ class ShiftSerializer(serializers.ModelSerializer):
 class EmployeeSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     shift = serializers.PrimaryKeyRelatedField(queryset=shifts.objects.all(), write_only=True, allow_null=True, required=False)
-    get_shift = ShiftSerializer(read_only=True)
+    get_shift = ShiftSerializer(source='shift')
     
     class Meta:
         model = Employee
@@ -52,7 +52,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     project_name = serializers.CharField(source='project.name', read_only=True)
     project_location = LocationSerializer(source='project.location', read_only=True)
-    employee_list = EmployeeSerializer(read_only=True, many=True)
+    employee_list = EmployeeSerializer(source="employees", many=True)
     employees = serializers.PrimaryKeyRelatedField(many=True, write_only=True, allow_empty=False, queryset=Employee.objects.all())
     class Meta:
         model = task
