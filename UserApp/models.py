@@ -42,7 +42,7 @@ class shifts(models.Model):
 
 class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    shift = models.OneToOneField(
+    shift = models.ForeignKey(
         shifts, on_delete=models.SET_NULL, null=True, blank=True)
 
 
