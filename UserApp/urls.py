@@ -16,4 +16,5 @@ urlpatterns = [
     path("auth/", auth, name="Login/Logout"),
     path("tasklist_project/", task_list_project_filter, name="Task List by Project"),
     path("tasklist_emp/", task_list_emp_filter, name="Task List by Employee"), 
+    path("get_attendance/", get_attendance, name="Attendance list & retrieve"),
 ]

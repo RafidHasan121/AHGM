@@ -5,7 +5,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from UserApp.models import Attendance, Employee, User, project, shifts, task
@@ -100,23 +100,23 @@ class shiftsViewSet(ModelViewSet):
 class attendanceViewSet(ModelViewSet):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
-    http_method_names = ['post', 'get', 'patch']
+    http_method_names = ['post', 'patch']
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        if self.action == 'list':
-            queryset = self.queryset.filter(checkIn_time__year=self.request.query_params['year'], checkIn_time__month=self.request.query_params['month']).distinct('employee')
-        if self.action == "retrieve":
-            queryset = self.queryset.filter(employee=self.request.query_params['employee'], checkIn_time__year=self.request.query_params['year'], checkIn_time__month=self.request.query_params['month']).order_by('checkIn_time')
-        return queryset
+    # def get_queryset(self):
+    #     if self.action == 'list':
+    #         queryset = self.queryset.filter(checkIn_time__year=self.request.query_params['year'], checkIn_time__month=self.request.query_params['month']).distinct('employee')
+    #     if self.action == "retrieve":
+    #         queryset = self.queryset.filter(employee=self.request.query_params['employee'], checkIn_time__year=self.request.query_params['year'], checkIn_time__month=self.request.query_params['month']).order_by('checkIn_time')
+    #     return queryset
     
-    def get_serializer_class(self):
-        if self.action == 'list':
-            serializer =  AttendanceListSerializer  
-        else:
-            serializer = self.serializer_class
+    # def get_serializer_class(self):
+    #     if self.action == 'list':
+    #         serializer =  AttendanceListSerializer  
+    #     else:
+    #         serializer = self.serializer_class
         
-        return serializer
+    #     return serializer
     
     def perform_create(self, serializer):
         serializer.is_valid(raise_exception=True)
@@ -127,9 +127,9 @@ class attendanceViewSet(ModelViewSet):
         return Response({'is_active': True,
                          'id': attendance_object.id}, status=201, headers=self.headers)
     
-    def retrieve(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.queryset, many=True)
-        return Response(serializer.data)
+    # def retrieve(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(self.queryset, many=True)
+    #     return Response(serializer.data)
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -146,6 +146,21 @@ class attendanceViewSet(ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return Response({'is_active': True}, status=200, headers=self.headers)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_attendance(request):
+    if not request.query_params.get('year') or not request.query_params.get('month'):
+        return Response(status=400)
+    if request.query_params.get('employee'):
+        queryset = Attendance.objects.filter(employee=request.query_params['employee'], checkIn_time__year=request.query_params['year'], checkIn_time__month=request.query_params['month']).order_by('checkIn_time')
+        serializer = AttendanceSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    else:
+        queryset = Attendance.objects.filter(checkIn_time__year=request.query_params['year'], checkIn_time__month=request.query_params['month']).distinct('employee')
+        serializer = AttendanceListSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 @api_view(['GET'])
 def status_check(request):
