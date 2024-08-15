@@ -133,7 +133,7 @@ class attendanceViewSet(ModelViewSet):
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
-        instance = Attendance.objects.filter(employee=request.data['employee']).order_by('-checkIn_time').first()
+        instance = Attendance.objects.filter(employee=request.data['employee']).order_by('-checkIn_date').order_by('-checkIn_time').first()
         if not instance:
             raise PermissionDenied
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
@@ -153,12 +153,12 @@ def get_attendance(request):
     if not request.query_params.get('year') or not request.query_params.get('month'):
         return Response(status=400)
     if request.query_params.get('employee'):
-        queryset = Attendance.objects.filter(employee=request.query_params['employee'], checkIn_time__year=request.query_params['year'], checkIn_time__month=request.query_params['month']).order_by('checkIn_time')
+        queryset = Attendance.objects.filter(employee=request.query_params['employee'], checkIn_date__year=request.query_params['year'], checkIn_date__month=request.query_params['month']).order_by('-checkIn_date').order_by('checkIn_time')
         serializer = AttendanceSerializer(queryset, many=True)
         return Response(serializer.data)
 
     else:
-        queryset = Attendance.objects.filter(checkIn_time__year=request.query_params['year'], checkIn_time__month=request.query_params['month']).distinct('employee')
+        queryset = Attendance.objects.filter(checkIn_date__year=request.query_params['year'], checkIn_date__month=request.query_params['month']).distinct('employee')
         serializer = AttendanceListSerializer(queryset, many=True)
         return Response(serializer.data)
 

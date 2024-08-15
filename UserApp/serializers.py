@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from rest_framework import serializers
 from UserApp.models import Employee, User, Attendance, location, project, shifts, task
 
@@ -106,23 +106,18 @@ class AttendanceListSerializer(serializers.ModelSerializer):
         # If the shift ends on the next day
         if end < start:
             # Filter records for attendance on the start day
-            attendance_count_day1 = self.queryset.filter(
-                employee=obj.employee, checkIn_time__gte=start, checkIn_time__lte=start +
-                timedelta(minutes=20)
-            ).count()
+            attendance_count_day1 = Attendance.objects.filter(
+                employee=obj.employee, checkIn_time__gte=start, checkIn_time__lte=start).count()
 
             # Filter records for attendance on the end day
-            attendance_count_day2 = self.queryset.filter(
-                employee=obj.employee, checkIn_time__gte=start - timedelta(days=1), checkIn_time__lte=end + timedelta(minutes=20)
-            ).count()
+            attendance_count_day2 = Attendance.objects.filter(
+                employee=obj.employee, checkIn_time__gte=start - timedelta(days=1), checkIn_time__lte=end).count()
 
             return attendance_count_day1 + attendance_count_day2
         else:
             # Shift does not span to the next day
-            attendance_count = self.queryset.filter(
-                employee=obj.employee, checkIn_time__gte=start, checkIn_time__lte=start +
-                timedelta(minutes=20)
-            ).count()
+            attendance_count = Attendance.objects.filter(
+                employee=obj.employee, checkIn_time__gte=start, checkIn_time__lte=start).count()
 
             return attendance_count
 
@@ -132,35 +127,34 @@ class AttendanceListSerializer(serializers.ModelSerializer):
 
         if end < start:
             # Shift spans over midnight
-            late_count_day1 = self.queryset.filter(
+            late_count_day1 =  Attendance.objects.filter(
                 employee=obj.employee,
-                checkIn_time__gte=start + timedelta(minutes=20),
-                checkIn_time__lt=start + timedelta(days=1)
+                checkIn_time__gte=start,
+                checkIn_time__lt=start
             ).count()
 
-            late_count_day2 = self.queryset.filter(
+            late_count_day2 =  Attendance.objects.filter(
                 employee=obj.employee,
-                checkIn_time__gte=start -
-                timedelta(days=1) + timedelta(minutes=20),
-                checkIn_time__lt=end + timedelta(days=1)
-            ).count()
+                checkIn_time__gte=start,
+                checkIn_time__lt=end).count()
 
             return late_count_day1 + late_count_day2
         else:
             # Shift does not span over midnight
-            late_count = self.queryset.filter(
+            late_count =  Attendance.objects.filter(
                 employee=obj.employee,
-                checkIn_time__gte=start + timedelta(minutes=20),
-                checkIn_time__lt=end
-            ).count()
+                checkIn_time__gte=start,
+                checkIn_time__lt=end).count()
 
             return late_count
 
     def get_overtime(self, obj):
         start = obj.employee.shift.start_time
         end = obj.employee.shift.end_time
-        total_hours = (end - start).total_seconds() / 3600
-        overtime_count = self.queryset.filter(
+        new_start = datetime.strptime(str(start), '%H:%M:%S')
+        new_end = datetime.strptime(str(end), '%H:%M:%S')
+        total_hours = (new_end - new_start).total_seconds() / 3600
+        overtime_count =  Attendance.objects.filter(
             employee=obj.employee, checkIn_time__gte=end).count()
         total_overtime = overtime_count * total_hours
         return total_overtime

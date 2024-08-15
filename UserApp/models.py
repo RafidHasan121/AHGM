@@ -56,9 +56,11 @@ class task(models.Model):
 
 class Attendance(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    checkIn_time = models.DateTimeField()
+    checkIn_date = models.DateField()
+    checkIn_time = models.TimeField()
     checkIn_location_lat = models.FloatField()
     checkIn_location_long = models.FloatField()
-    checkOut_time = models.DateTimeField(null=True, blank=True)
+    checkOut_date = models.DateField(null=True, blank=True)
+    checkOut_time = models.TimeField(null=True, blank=True)
     checkOut_location_lat = models.FloatField(null=True, blank=True)
     checkOut_location_long = models.FloatField(null=True, blank=True)
