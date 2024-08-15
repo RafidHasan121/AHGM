@@ -103,33 +103,11 @@ class attendanceViewSet(ModelViewSet):
     http_method_names = ['post', 'patch']
     permission_classes = [IsAuthenticated]
 
-    # def get_queryset(self):
-    #     if self.action == 'list':
-    #         queryset = self.queryset.filter(checkIn_time__year=self.request.query_params['year'], checkIn_time__month=self.request.query_params['month']).distinct('employee')
-    #     if self.action == "retrieve":
-    #         queryset = self.queryset.filter(employee=self.request.query_params['employee'], checkIn_time__year=self.request.query_params['year'], checkIn_time__month=self.request.query_params['month']).order_by('checkIn_time')
-    #     return queryset
-    
-    # def get_serializer_class(self):
-    #     if self.action == 'list':
-    #         serializer =  AttendanceListSerializer  
-    #     else:
-    #         serializer = self.serializer_class
-        
-    #     return serializer
-    
     def perform_create(self, serializer):
         serializer.is_valid(raise_exception=True)
-        # print(serializer.validated_data.get('checkIn_time').date())
-        # if not serializer.validated_data.get('checkIn_time').date() == datetime.now().date():
-        #     raise PermissionDenied
         attendance_object = serializer.save()
         return Response({'is_active': True,
                          'id': attendance_object.id}, status=201, headers=self.headers)
-    
-    # def retrieve(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(self.queryset, many=True)
-    #     return Response(serializer.data)
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)

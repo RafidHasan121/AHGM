@@ -22,6 +22,11 @@ class ShiftSerializer(serializers.ModelSerializer):
     class Meta:
         model = shifts
         fields = '__all__'
+        
+    def create(self, validated_data):
+        if validated_data['start_time'] > validated_data['end_time']:
+            raise serializers.ValidationError("Start time cannot be greater than end time")
+        return super().create(validated_data)
 
 class EmployeeSerializer(serializers.ModelSerializer):
     user = UserSerializer()
