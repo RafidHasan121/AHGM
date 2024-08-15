@@ -11,6 +11,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'name', 'phone', 'password', 'photo', 'designation', 'address')
+        
+    def create(self, validated_data):
+        user = super(UserSerializer, self).create(validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
 class ShiftSerializer(serializers.ModelSerializer):
     class Meta:
