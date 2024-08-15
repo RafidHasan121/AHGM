@@ -152,9 +152,10 @@ def status_check(request):
     emp = request.query_params.get('employee')
     if not emp:
         raise ObjectDoesNotExist
-    instance = Attendance.objects.get(employee=emp).latest('checkIn_time')
-    if not instance:
-        raise ObjectDoesNotExist
+    try:
+        instance = Attendance.objects.get(employee=emp).latest('checkIn_time')
+    except:
+        return Response(status=404)
     if not instance.checkOut_time:
         R = {'is_active': True,
              'id': instance.id}
