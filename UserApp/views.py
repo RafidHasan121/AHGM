@@ -103,6 +103,12 @@ class attendanceViewSet(ModelViewSet):
     http_method_names = ['post', 'patch']
     permission_classes = [IsAuthenticated]
 
+    def create(self, request, *args, **kwargs):
+        user_id = request.data.pop('employee')
+        emp = Employee.objects.get(user=user_id)
+        request.data.update({'employee': emp.id})
+        return super().create(request, *args, **kwargs)
+    
     def perform_create(self, serializer):
         serializer.is_valid(raise_exception=True)
         attendance_object = serializer.save()
@@ -111,7 +117,7 @@ class attendanceViewSet(ModelViewSet):
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
-        instance = Attendance.objects.filter(employee=request.data['employee']).order_by('-checkIn_date').order_by('-checkIn_time').first()
+        instance = Attendance.objects.filter(employee__user=request.data['employee']).order_by('-checkIn_date').order_by('-checkIn_time').first()
         if not instance:
             raise PermissionDenied
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
@@ -144,9 +150,9 @@ def get_attendance(request):
 def status_check(request):
     emp = request.query_params.get('employee')
     if not emp:
-        raise ObjectDoesNotExist
+        return Response(status=404)
     try:
-        instance = Attendance.objects.get(employee=emp).latest('checkIn_time')
+        instance = Attendance.objects.get(employee__user=emp).latest('checkIn_time')
     except:
         return Response(status=404)
     if not instance.checkOut_time:
