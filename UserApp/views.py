@@ -115,21 +115,21 @@ class attendanceViewSet(ModelViewSet):
         return Response({'is_active': True,
                          'id': attendance_object.id}, status=201, headers=self.headers)
     
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = Attendance.objects.filter(employee__user=request.data['employee']).order_by('-checkIn_date').order_by('-checkIn_time').first()
-        if not instance:
-            raise PermissionDenied
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+    # def update(self, request, *args, **kwargs):
+    #     partial = kwargs.pop('partial', False)
+    #     instance = Attendance.objects.filter(employee__user=request.data['employee']).order_by('-checkIn_date').order_by('-checkIn_time').first()
+    #     if not instance:
+    #         raise PermissionDenied
+    #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_update(serializer)
 
-        if getattr(instance, '_prefetched_objects_cache', None):
-            # If 'prefetch_related' has been applied to a queryset, we need to
-            # forcibly invalidate the prefetch cache on the instance.
-            instance._prefetched_objects_cache = {}
+    #     if getattr(instance, '_prefetched_objects_cache', None):
+    #         # If 'prefetch_related' has been applied to a queryset, we need to
+    #         # forcibly invalidate the prefetch cache on the instance.
+    #         instance._prefetched_objects_cache = {}
 
-        return Response({'is_active': True}, status=200, headers=self.headers)
+    #     return Response({'is_active': True}, status=200, headers=self.headers)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -152,7 +152,7 @@ def status_check(request):
     if not emp:
         return Response(status=404)
     try:
-        instance = Attendance.objects.get(employee__user=emp).latest('checkIn_time')
+        instance = Attendance.objects.filter(employee__user=emp).latest('checkIn_date')
     except:
         return Response(status=404)
     if not instance.checkOut_time:
