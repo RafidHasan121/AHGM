@@ -146,6 +146,7 @@ class attendanceViewSet(ModelViewSet):
     #     return Response({'is_active': True}, status=200, headers=self.headers)
 
 @api_view(['GET'])
+@renderer_classes([CustomJSONRenderer])
 @permission_classes([IsAuthenticated])
 def get_attendance(request):
     if not request.query_params.get('year') or not request.query_params.get('month'):
@@ -161,6 +162,7 @@ def get_attendance(request):
         return Response(serializer.data)
 
 @api_view(['GET'])
+@renderer_classes([CustomJSONRenderer])
 def status_check(request):
     emp = request.query_params.get('employee')
     if not emp:
@@ -184,7 +186,7 @@ def auth(request):
         password = request.data.get('password')
         user = User.objects.filter(phone=phone).first()
         if user is None:
-            raise ObjectDoesNotExist
+            return Response(status=404)
         if check_password(password, user.password):
             token = Token.objects.update_or_create(user=user)
             if user.is_staff:
@@ -204,16 +206,18 @@ def auth(request):
         try:
             Token.objects.filter(user=request.user).delete()
         except:
-            raise ObjectDoesNotExist
+            return Response(status=400)
         return Response(status=200)
 
 @api_view(['GET'])
+@renderer_classes([CustomJSONRenderer])
 def task_list_project_filter(request):
     queryset = task.objects.filter(project=request.query_params.get('project'))
     serializer = TaskSerializer(queryset, many=True)
     return Response(serializer.data, status=200)
 
 @api_view(['GET'])
+@renderer_classes([CustomJSONRenderer])
 def task_list_emp_filter(request):
     print(request.user)
     if request.user == AnonymousUser():
