@@ -4,8 +4,9 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.viewsets import ModelViewSet
+from Backend.custom_renderer import CustomJSONRenderer
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from UserApp.models import Attendance, Employee, User, project, shifts, task
@@ -176,6 +177,7 @@ def status_check(request):
     return Response(R, status=200)
 
 @api_view(['POST', 'GET'])
+@renderer_classes([CustomJSONRenderer])
 def auth(request):
     if request.method == 'POST':
         phone = request.data.get('phone')
