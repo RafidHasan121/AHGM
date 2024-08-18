@@ -167,7 +167,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ],
-    # 'EXCEPTION_HANDLER': 'Backend.custom_renderer.custom_exception_handler'
+    'EXCEPTION_HANDLER': 'Backend.custom_renderer.custom_exception_handler'
 }
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

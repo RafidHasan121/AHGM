@@ -8,9 +8,11 @@ class UserSerializer(serializers.ModelSerializer):
         required=True,
         style={'input_type': 'password', 'placeholder': 'Password'}
     )
+    is_admin = serializers.BooleanField(read_only=True, source='is_staff')
+    
     class Meta:
         model = User
-        fields = ('id', 'name', 'phone', 'password', 'photo', 'designation', 'address')
+        fields = ('id', 'name', 'phone', 'password', 'photo', 'designation', 'address', 'is_admin')
         
     def create(self, validated_data):
         user = super(UserSerializer, self).create(validated_data)

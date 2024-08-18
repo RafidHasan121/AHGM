@@ -14,11 +14,24 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 # Create your views here.
 
 class AdminViewSet(ModelViewSet):
-    queryset = User.objects.filter(is_staff=True)
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     http_method_names = ['get', 'patch']
     permission_classes = [IsAdminUser]
     
+    def get_permissions(self):
+        if self.action == 'retrieve' or 'list':
+            permission_classes = [IsAuthenticated]
+        
+        return [permission() for permission in permission_classes]    
+    
+    def get_queryset(self):
+        if self.action == 'list':
+            queryset = self.queryset.filter(id=self.request.user.id)
+            
+        return queryset
+
+
 class EmployeeViewSet(ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
@@ -136,11 +149,11 @@ class attendanceViewSet(ModelViewSet):
 def get_attendance(request):
     if not request.query_params.get('year') or not request.query_params.get('month'):
         return Response(status=400)
+    
     if request.query_params.get('employee'):
         queryset = Attendance.objects.filter(employee=request.query_params['employee'], checkIn_date__year=request.query_params['year'], checkIn_date__month=request.query_params['month']).order_by('-checkIn_date').order_by('checkIn_time')
         serializer = AttendanceSerializer(queryset, many=True)
         return Response(serializer.data)
-
     else:
         queryset = Attendance.objects.filter(checkIn_date__year=request.query_params['year'], checkIn_date__month=request.query_params['month']).distinct('employee')
         serializer = AttendanceListSerializer(queryset, many=True)
@@ -167,7 +180,7 @@ def auth(request):
     if request.method == 'POST':
         phone = request.data.get('phone')
         password = request.data.get('password')
-        user = User.objects.get(phone=phone)
+        user = User.objects.filter(phone=phone).first()
         if user is None:
             raise ObjectDoesNotExist
         if check_password(password, user.password):
