@@ -19,6 +19,7 @@ class AdminViewSet(ModelViewSet):
     serializer_class = UserSerializer
     http_method_names = ['get', 'patch']
     permission_classes = [IsAdminUser]
+    renderer_classes = [CustomJSONRenderer]
     
     def get_permissions(self):
         if self.action == 'retrieve' or 'list':
@@ -38,6 +39,7 @@ class EmployeeViewSet(ModelViewSet):
     serializer_class = EmployeeSerializer
     http_method_names = ['post', 'get', 'patch', 'delete']
     permission_classes = [IsAdminUser]
+    renderer_classes = [CustomJSONRenderer]
 
     def get_permissions(self):
         if self.action == 'retrieve' or 'list':
@@ -67,7 +69,8 @@ class projectViewSet(ModelViewSet):
     serializer_class = ProjectSerializer
     http_method_names = ['post', 'get', 'patch', 'delete']
     permission_classes = [IsAdminUser]
-
+    renderer_classes = [CustomJSONRenderer]
+    
     def get_permissions(self):
         if self.action == 'retrieve' or 'list':
             permission_classes = [IsAuthenticated]
@@ -80,7 +83,8 @@ class taskViewSet(ModelViewSet):
     serializer_class = TaskSerializer
     http_method_names = ['post', 'get', 'patch', 'delete']
     permission_classes = [IsAdminUser]
-
+    renderer_classes = [CustomJSONRenderer]
+    
     def get_permissions(self):
         if self.action == 'retrieve' or 'list':
             permission_classes = [IsAuthenticated]
@@ -103,7 +107,8 @@ class shiftsViewSet(ModelViewSet):
     serializer_class = ShiftsSerializer
     http_method_names = ['post', 'get', 'patch', 'delete']
     permission_classes = [IsAdminUser]
-
+    renderer_classes = [CustomJSONRenderer]
+    
     def get_permissions(self):
         if self.action == 'retrieve' or 'list':
             permission_classes = [IsAuthenticated]
@@ -116,7 +121,8 @@ class attendanceViewSet(ModelViewSet):
     serializer_class = AttendanceSerializer
     http_method_names = ['post', 'patch']
     permission_classes = [IsAuthenticated]
-
+    renderer_classes = [CustomJSONRenderer]
+    
     def create(self, request, *args, **kwargs):
         user_id = request.data.pop('employee')
         emp = Employee.objects.get(user=user_id)
@@ -219,9 +225,8 @@ def task_list_project_filter(request):
 @api_view(['GET'])
 @renderer_classes([CustomJSONRenderer])
 def task_list_emp_filter(request):
-    print(request.user)
-    if request.user == AnonymousUser():
+    if request.user == AnonymousUser() or request.user.is_staff:
         return Response(status=401)
-    queryset = task.objects.filter(employees=request.user)
+    queryset = task.objects.filter(employees__user=request.user)
     serializer = TaskSerializer(queryset, many=True)
     return Response(serializer.data, status=200)
