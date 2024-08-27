@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from UserApp.models import Attendance, Employee, User, project, shifts, task
 from UserApp.serializers import AttendanceListSerializer, EmployeeSerializer, ProjectSerializer, ShiftsSerializer, TaskSerializer, AttendanceSerializer, UserSerializer
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+
 # Create your views here.
 
 class AdminViewSet(ModelViewSet):
