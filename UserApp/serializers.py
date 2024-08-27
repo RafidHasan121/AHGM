@@ -97,7 +97,7 @@ class TaskSerializer(serializers.ModelSerializer):
     employee_list = EmployeeSerializer(
         source="employees", many=True, read_only=True)
     employees = serializers.PrimaryKeyRelatedField(
-        many=True, write_only=True, allow_empty=False, queryset=Employee.objects.all())
+        many=True, write_only=True, allow_empty=True, queryset=Employee.objects.all())
 
     class Meta:
         model = task
