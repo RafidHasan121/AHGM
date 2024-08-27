@@ -3,7 +3,9 @@ attrs==24.2.0
 dj-database-url==2.2.0
 Django==5.0.7
 djangorestframework==3.15.2
+drf-extra-fields==3.7.0
 drf-spectacular==0.27.2
+filetype==1.2.0
 gunicorn==22.0.0
 inflection==0.5.1
 jsonschema==4.23.0

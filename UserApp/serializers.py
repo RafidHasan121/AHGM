@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 from rest_framework import serializers
 from UserApp.models import Employee, User, Attendance, location, project, shifts, task
-
+from drf_extra_fields.fields import Base64ImageField
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
@@ -10,6 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
         style={'input_type': 'password', 'placeholder': 'Password'}
     )
     is_admin = serializers.BooleanField(read_only=True, source='is_staff')
+    photo = Base64ImageField(required=False)
 
     class Meta:
         model = User
@@ -50,6 +51,24 @@ class EmployeeSerializer(serializers.ModelSerializer):
         user = User.objects.create(**user_data)
         employee = Employee.objects.create(user=user, **validated_data)
         return employee
+    
+    def update(self, instance, validated_data):
+        shift_data = validated_data.pop('shift', None)
+        user_data = validated_data.pop('user', None)
+        for (key, value) in validated_data.items():
+            setattr(instance, key, value)
+        if shift_data is not None:
+            shift_object = instance.shift
+            for (key, value) in shift_data.items():
+                setattr(shift_object, key, value)
+            shift_object.save()
+        if user_data is not None:
+            user_object = instance.user
+            for (key, value) in user_data.items():
+                setattr(user_object, key, value)
+            user_object.save()
+        instance.save()
+        return instance
 
 
 class LocationSerializer(serializers.ModelSerializer):
