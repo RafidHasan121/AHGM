@@ -76,7 +76,7 @@ class projectViewSet(ModelViewSet):
             permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
-
+    
 
 class taskViewSet(ModelViewSet):
     queryset = task.objects.all()

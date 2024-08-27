@@ -77,12 +77,17 @@ class ProjectSerializer(serializers.ModelSerializer):
             location=location_object, **validated_data)
         return project_object
 
-    def update(self, validated_data):
-        location_data = validated_data.pop('location')
-        location_object = location.objects.update(**location_data)
-        project_object = project.objects.update(
-            location=location_object, **validated_data)
-        return project_object
+    def update(self, instance, validated_data):
+        location_data = validated_data.pop('location', None)
+        for (key, value) in validated_data.items():
+            setattr(instance, key, value)
+        if location_data is not None:
+            location_object = instance.location
+            for (key, value) in location_data.items():
+                setattr(location_object, key, value)
+            location_object.save()
+        instance.save()
+        return instance
 
 
 class TaskSerializer(serializers.ModelSerializer):
