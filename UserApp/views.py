@@ -19,14 +19,14 @@ class AdminViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     http_method_names = ['get', 'patch']
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
     renderer_classes = [CustomJSONRenderer]
 
-    def get_permissions(self):
-        if self.action == 'retrieve' or 'list':
-            permission_classes = [IsAuthenticated]
+    # def get_permissions(self):
+    #     if self.action == 'retrieve' or 'list':
+    #         permission_classes = [IsAuthenticated]
 
-        return [permission() for permission in permission_classes]
+    #     return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         if self.action == 'list':
