@@ -22,6 +22,13 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+    
+    def update(self, instance, validated_data):
+        user = super(UserSerializer, self).update(instance, validated_data)
+        if validated_data.get('password'):
+            user.set_password(validated_data['password'])
+            user.save()
+        return user
 
 
 class ShiftSerializer(serializers.ModelSerializer):
