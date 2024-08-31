@@ -20,7 +20,7 @@ class AdminViewSet(ModelViewSet):
     serializer_class = UserSerializer
     http_method_names = ['get', 'patch']
     permission_classes = [IsAuthenticated]
-    # renderer_classes = [CustomJSONRenderer]
+    renderer_classes = [CustomJSONRenderer]
 
     # def get_permissions(self):
     #     if self.action == 'retrieve' or 'list':
@@ -69,7 +69,8 @@ class EmployeeViewSet(ModelViewSet):
         self.perform_destroy(instance)
         serializer = EmployeeSerializer(instance)
         return Response(serializer.data, status=200)
-    
+
+
 class projectViewSet(ModelViewSet):
     queryset = project.objects.all()
     serializer_class = ProjectSerializer
@@ -87,7 +88,7 @@ class projectViewSet(ModelViewSet):
         instance = self.get_object()
         self.perform_destroy(instance)
         data = project.objects.all()
-        serializer = ProjectSerializer(data, many=True)       
+        serializer = ProjectSerializer(data, many=True)
         return Response(serializer.data, status=200)
 
 
@@ -145,9 +146,11 @@ class taskViewSet(ModelViewSet):
         instance = self.get_object()
         project = instance.project
         self.perform_destroy(instance)
-        serializer = TaskSerializer(task.objects.filter(project=project), many=True)
+        serializer = TaskSerializer(
+            task.objects.filter(project=project), many=True)
         return Response(serializer.data, status=200)
-                        
+
+
 class shiftsViewSet(ModelViewSet):
     queryset = shifts.objects.all()
     serializer_class = ShiftsSerializer
