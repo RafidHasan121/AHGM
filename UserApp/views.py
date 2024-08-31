@@ -30,9 +30,9 @@ class AdminViewSet(ModelViewSet):
 
     def get_queryset(self):
         if self.action == 'list':
-            queryset = self.queryset.filter(id=self.request.user.id)
+            self.queryset = self.queryset.filter(id=self.request.user.id)
 
-        return queryset
+        return self.queryset
 
 
 class EmployeeViewSet(ModelViewSet):
@@ -77,6 +77,13 @@ class projectViewSet(ModelViewSet):
             permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        data = project.objects.all()
+        serializer = ProjectSerializer(data, many=True)       
+        return Response(serializer.data, status=200)
 
 
 class taskViewSet(ModelViewSet):
@@ -129,7 +136,13 @@ class taskViewSet(ModelViewSet):
 
         return super().update(request, *args, **kwargs)
 
-
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        project = instance.project
+        self.perform_destroy(instance)
+        serializer = TaskSerializer(task.objects.filter(project=project), many=True)
+        return Response(serializer.data, status=200)
+                        
 class shiftsViewSet(ModelViewSet):
     queryset = shifts.objects.all()
     serializer_class = ShiftsSerializer
@@ -161,11 +174,12 @@ class attendanceViewSet(ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response({'is_active': True,
                          'id': attendance_object.id}, status=201, headers=headers)
-    
+
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
@@ -175,7 +189,6 @@ class attendanceViewSet(ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return Response({'is_active': False}, status=200)
-
 
 
 @api_view(['GET'])
