@@ -40,7 +40,7 @@ class EmployeeViewSet(ModelViewSet):
     serializer_class = EmployeeSerializer
     http_method_names = ['post', 'get', 'patch', 'delete']
     permission_classes = [IsAdminUser]
-    # renderer_classes = [CustomJSONRenderer]
+    renderer_classes = [CustomJSONRenderer]
 
     def get_permissions(self):
         if self.action == 'retrieve' or 'list':
