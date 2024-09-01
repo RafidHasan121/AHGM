@@ -40,7 +40,7 @@ class EmployeeViewSet(ModelViewSet):
     serializer_class = EmployeeSerializer
     http_method_names = ['post', 'get', 'patch', 'delete']
     permission_classes = [IsAdminUser]
-    renderer_classes = [CustomJSONRenderer]
+    # renderer_classes = [CustomJSONRenderer]
 
     def get_permissions(self):
         if self.action == 'retrieve' or 'list':
@@ -48,22 +48,6 @@ class EmployeeViewSet(ModelViewSet):
 
         return [permission() for permission in permission_classes]
 
-    # def update(self, request, *args, **kwargs):
-    #     if not self.request.user.is_staff:
-    #         kwargs.pop('shift', None)
-    #         kwargs.pop('project', None)
-    #         if "password" in kwargs:
-    #             pswrd = kwargs.pop('password')
-    #             self.get_object().user.set_password(pswrd)
-    #             self.get_object().user.save()
-    #     else:
-    #         if kwargs['password']:
-    #             kwargs.pop('password')
-    #             self.get_object().user.set_password("123456")
-    #             self.get_object().user.save()
-
-    #     return super().update(request, *args, **kwargs)
-    
     def update(self, request, *args, **kwargs): 
         partial = kwargs.pop('partial', False)
         instance = self.queryset.get(user=kwargs['pk'])

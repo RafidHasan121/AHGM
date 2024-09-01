@@ -45,8 +45,8 @@ class ShiftSerializer(serializers.ModelSerializer):
 
 class EmployeeSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    shift = serializers.PrimaryKeyRelatedField(
-        queryset=shifts.objects.all(), write_only=True, allow_null=True, required=False)
+    # shift = serializers.PrimaryKeyRelatedField(
+    #     queryset=shifts.objects.all(), write_only=True, allow_null=True, required=False)
     get_shift = ShiftSerializer(source='shift', read_only=True)
 
     class Meta:
@@ -60,15 +60,9 @@ class EmployeeSerializer(serializers.ModelSerializer):
         return employee
     
     def update(self, instance, validated_data):
-        shift_data = validated_data.pop('shift', None)
         user_data = validated_data.pop('user', None)
         for (key, value) in validated_data.items():
             setattr(instance, key, value)
-        if shift_data is not None:
-            shift_object = instance.shift
-            for (key, value) in shift_data.items():
-                setattr(shift_object, key, value)
-            shift_object.save()
         if user_data is not None:
             user_object = instance.user
             for (key, value) in user_data.items():
