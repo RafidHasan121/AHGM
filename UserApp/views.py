@@ -163,6 +163,13 @@ class shiftsViewSet(ModelViewSet):
             permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        serializer = ShiftsSerializer(
+            shifts.objects.all(), many=True)
+        return Response(serializer.data, status=200)
 
 
 class attendanceViewSet(ModelViewSet):
@@ -228,7 +235,7 @@ def status_check(request):
         instance = Attendance.objects.filter(
             employee__user=emp).latest('checkIn_date')
     except:
-        return Response(status=404)
+        return Response({'is_active': False}, status=200)
     if not instance.checkOut_time:
         R = {'is_active': True,
              'id': instance.id}
